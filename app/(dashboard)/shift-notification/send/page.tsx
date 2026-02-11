@@ -361,45 +361,6 @@ ${site.details}
         />
       )}
 
-      {/* Template Edit Modal */}
-      <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>メールテンプレートを編集</DialogTitle>
-            <DialogDescription>メールのヘッダーとフッターをカスタマイズできます。</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="template-header">ヘッダー（本文の前に追加）</Label>
-              <Textarea
-                id="template-header"
-                value={templateHeader}
-                onChange={(e) => setTemplateHeader(e.target.value)}
-                placeholder="例：お疲れ様です。明日の予定をお知らせします。"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="template-footer">フッター（本文の後に追加）</Label>
-              <Textarea
-                id="template-footer"
-                value={templateFooter}
-                onChange={(e) => setTemplateFooter(e.target.value)}
-                placeholder="例：よろしくお願いいたします。"
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
-              キャンセル
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsTemplateModalOpen(false)}>
-              保存
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
