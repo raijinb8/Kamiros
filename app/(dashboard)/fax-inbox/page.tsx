@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useCallback, Suspense } from "react"
-import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,9 +8,8 @@ import { ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftOpen } from "lucide
 import { FaxDetailForm } from "@/components/fax-detail-form"
 import { FaxList } from "@/components/fax-list"
 import { FaxPreview } from "@/components/fax-preview"
+import FaxConfirmDialog from "@/components/fax-confirm-dialog"
 import { dummyFaxList, faxToFormData, type FaxItem, type FaxStatus, type FaxFormData } from "@/lib/fax-data"
-
-const FaxConfirmDialog = dynamic(() => import("@/components/fax-confirm-dialog"), { ssr: false })
 
 function FaxInboxContent() {
   const router = useRouter()

@@ -2,7 +2,6 @@
 
 import { Suspense } from "react"
 import { useState, useMemo } from "react"
-import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,16 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Label } from "@/components/ui/label"
 import { Info, Send, Mail, CheckCircle2, FileText, AlertCircle, ChevronLeft, Users } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
-
-// Lazy-load heavy dialog components
-const BulkSendConfirmDialog = dynamic(
-  () => import("@/components/shift-send-dialogs").then((mod) => ({ default: mod.BulkSendConfirmDialog })),
-  { ssr: false },
-)
-const TemplateEditDialog = dynamic(
-  () => import("@/components/shift-send-dialogs").then((mod) => ({ default: mod.TemplateEditDialog })),
-  { ssr: false },
-)
+import { BulkSendConfirmDialog, TemplateEditDialog } from "@/components/shift-send-dialogs"
 
 function ShiftNotificationSendContent() {
   const router = useRouter()
