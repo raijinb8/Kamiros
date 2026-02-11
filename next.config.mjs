@@ -4,7 +4,10 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   experimental: {
-    optimizePackageImports: ["lucide-react", "react-pdf"],
+    optimizePackageImports: [
+      "lucide-react",
+      "react-pdf",
+    ],
   },
 }
 
