@@ -3,7 +3,7 @@
 import { Suspense, memo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Inbox, Send, Settings } from "lucide-react"
+import { Home, Inbox, Send, Settings, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
@@ -22,6 +22,11 @@ const navItems = [
     label: "シフト連絡",
     icon: Send,
     href: "/shift-notification",
+  },
+  {
+    label: "案件管理",
+    icon: ClipboardList,
+    href: "/projects",
   },
   {
     label: "設定",
