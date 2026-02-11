@@ -1,14 +1,17 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 import "react-pdf/dist/esm/Page/AnnotationLayer.css"
 import "react-pdf/dist/esm/Page/TextLayer.css"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+// Configure PDF.js worker using CDN with correct path for v4+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url,
+).toString()
 
 interface PdfViewerProps {
   file: string
@@ -19,11 +22,50 @@ interface PdfViewerProps {
 export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0)
   const [currentPage, setCurrentPage] = useState(1)
+  const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    setNumPages(numPages)
-    setCurrentPage(1)
-  }, [])
+  // Fetch the PDF as an ArrayBuffer to ensure binary integrity
+  useEffect(() => {
+    setLoadError(null)
+    setPdfData(null)
+    fetch(file)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.arrayBuffer()
+      })
+      .then((buffer) => {
+        setPdfData(buffer)
+      })
+      .catch((err) => {
+        setLoadError(err.message)
+      })
+  }, [file])
+
+  const onDocumentLoadSuccess = useCallback(
+    ({ numPages }: { numPages: number }) => {
+      setNumPages(numPages)
+      setCurrentPage(1)
+    },
+    [],
+  )
+
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-12 text-red-500 gap-2">
+        <p className="font-medium">PDF読み込みエラー</p>
+        <p className="text-sm text-slate-500">{loadError}</p>
+      </div>
+    )
+  }
+
+  if (!pdfData) {
+    return (
+      <div className="flex items-center justify-center h-full p-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -36,16 +78,20 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
           }}
         >
           <Document
-            file={file}
+            file={{ data: pdfData }}
             onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={(error) => {
+              setLoadError(error.message)
+            }}
             loading={
               <div className="flex items-center justify-center p-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
               </div>
             }
             error={
-              <div className="flex items-center justify-center p-12 text-red-500">
-                <p>PDF読み込みエラー</p>
+              <div className="flex flex-col items-center justify-center p-12 text-red-500 gap-2">
+                <p className="font-medium">PDF読み込みエラー</p>
+                <p className="text-sm text-slate-500">PDFファイルの形式を確認してください</p>
               </div>
             }
           >
