@@ -1,9 +1,9 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, memo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Inbox, Send, Settings } from "lucide-react"
+import { Home, Inbox, Send, Settings, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
@@ -22,6 +22,11 @@ const navItems = [
     label: "シフト連絡",
     icon: Send,
     href: "/shift-notification",
+  },
+  {
+    label: "案件管理",
+    icon: ClipboardList,
+    href: "/projects",
   },
   {
     label: "設定",
@@ -60,13 +65,13 @@ function SidebarNav() {
   )
 }
 
-export function Sidebar() {
+export const Sidebar = memo(function Sidebar() {
   const { isCollapsed } = useSidebar()
 
   return (
     <aside
       className={cn(
-        "fixed left-0 top-16 bottom-0 z-40 bg-slate-900 transition-all duration-300 ease-in-out",
+        "fixed left-0 top-16 bottom-0 z-40 bg-slate-900 transition-[width] duration-300 ease-in-out",
         isCollapsed ? "w-20" : "w-64",
       )}
     >
@@ -75,4 +80,4 @@ export function Sidebar() {
       </Suspense>
     </aside>
   )
-}
+})

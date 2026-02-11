@@ -1,16 +1,18 @@
 "use client"
 
 import { Suspense } from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Info, Calendar, Clock, Users, Search, Filter, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Info, Calendar, Clock, Users, Search, Filter, ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
+import { SiteAssignmentRow } from "@/components/site-assignment-row"
 
 // Time filter options
 const timeFilters = [
@@ -40,7 +42,39 @@ const assignmentStatusFilters = [
 
 function ShiftNotificationContent() {
   const router = useRouter()
-  const { selectedDate, setSelectedDate, sites, workers, assignWorkerToSite } = useShift()
+  const { selectedDate, setSelectedDate, sites, workers, assignWorkerToSite, getWorkerAssignedSites, getAssignedWorkersForSite } = useShift()
+
+  // Email preview state
+  const [selectedPreviewWorker, setSelectedPreviewWorker] = useState<string | null>(null)
+
+  // Workers that have at least one site assigned
+  const assignedWorkerNames = useMemo(() => {
+    const names = new Set<string>()
+    for (const site of sites) {
+      for (const w of site.assignedWorkers) {
+        if (w) names.add(w)
+      }
+    }
+    return Array.from(names)
+  }, [sites])
+
+  // Auto-select first assigned worker for preview
+  const previewWorkerName = selectedPreviewWorker && assignedWorkerNames.includes(selectedPreviewWorker)
+    ? selectedPreviewWorker
+    : assignedWorkerNames[0] || null
+
+  // Generate email content for a given worker
+  const generateEmailContent = (workerName: string) => {
+    const assignedSites = getWorkerAssignedSites(workerName)
+    if (assignedSites.length === 0) return null
+
+    const sections = assignedSites.map((site) => {
+      const assignedWorkers = getAssignedWorkersForSite(site.id)
+      return `${site.time}～\n${site.tradingPartner}　${site.contactPerson}\n${site.siteName}\n${site.details}\n班長：${assignedWorkers.join("、")}`
+    })
+
+    return sections.join("\n\n─────────────────────────────────\n\n")
+  }
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("")
@@ -118,17 +152,12 @@ function ShiftNotificationContent() {
     setCurrentPage(1)
   }
 
-  const getAvailableWorkersForSlot = (siteId: string, slotIndex: number) => {
-    const site = sites.find((s) => s.id === siteId)
-    if (!site) return workers
-
-    const assignedInSite = site.assignedWorkers.filter((w, idx) => w !== null && idx !== slotIndex)
-    return workers.filter((worker) => !assignedInSite.includes(worker.name))
-  }
-
-  const handleWorkerChange = (siteId: string, slotIndex: number, value: string) => {
-    assignWorkerToSite(siteId, slotIndex, value === "none" ? null : value)
-  }
+  const handleWorkerChange = useCallback(
+    (siteId: string, slotIndex: number, value: string) => {
+      assignWorkerToSite(siteId, slotIndex, value === "none" ? null : value)
+    },
+    [assignWorkerToSite],
+  )
 
   return (
     <div className="space-y-6">
@@ -197,7 +226,7 @@ function ShiftNotificationContent() {
           <div className="flex flex-wrap items-center gap-4">
             {/* Time Filter */}
             <div className="flex items-center gap-2">
-              <Label className="text-sm text-slate-600">時間帯</Label>
+              <Label className="text-sm text-slate-600">時間���</Label>
               <Select value={timeFilter} onValueChange={(v) => handleFilterChange(setTimeFilter, v)}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -294,59 +323,14 @@ function ShiftNotificationContent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedSites.map((site) => {
-                  const status = getAssignmentStatus(site.assignedWorkers)
-                  return (
-                    <TableRow
-                      key={site.id}
-                      className={
-                        status === "assigned" ? "bg-green-50/50" : status === "partial" ? "bg-yellow-50/50" : "bg-white"
-                      }
-                    >
-                      <TableCell className="font-medium text-slate-900">{site.time}</TableCell>
-                      <TableCell className="text-slate-700 font-medium">{site.siteName}</TableCell>
-                      <TableCell className="text-slate-600">{site.tradingPartner}</TableCell>
-                      <TableCell className="text-slate-600 text-sm">{site.address}</TableCell>
-                      {Array.from({ length: 4 }).map((_, slotIndex) => {
-                        if (slotIndex >= site.requiredWorkers) {
-                          return (
-                            <TableCell key={slotIndex}>
-                              <div className="h-9 bg-slate-100 rounded-md flex items-center justify-center text-slate-400 text-sm">
-                                —
-                              </div>
-                            </TableCell>
-                          )
-                        }
-
-                        const availableWorkers = getAvailableWorkersForSlot(site.id, slotIndex)
-                        const currentValue = site.assignedWorkers[slotIndex]
-
-                        return (
-                          <TableCell key={slotIndex}>
-                            <Select
-                              value={currentValue || "none"}
-                              onValueChange={(value) => handleWorkerChange(site.id, slotIndex, value)}
-                            >
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="選択してください" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none" className="text-slate-400">
-                                  選択してください
-                                </SelectItem>
-                                {availableWorkers.map((worker) => (
-                                  <SelectItem key={worker.id} value={worker.name}>
-                                    {worker.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                        )
-                      })}
-                    </TableRow>
-                  )
-                })}
+                {paginatedSites.map((site) => (
+                  <SiteAssignmentRow
+                    key={site.id}
+                    site={site}
+                    allWorkers={workers}
+                    onWorkerChange={handleWorkerChange}
+                  />
+                ))}
               </TableBody>
             </Table>
           </div>
@@ -410,6 +394,79 @@ function ShiftNotificationContent() {
         </CardContent>
       </Card>
 
+      {/* Section 4: Real-time Email Preview */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-slate-900 flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            メール内容確認（リアルタイム更新）
+          </CardTitle>
+          <p className="text-sm text-slate-500">
+            作業員を現場に割り当てると、送信されるメールの内容がリアルタイムで表示されます。
+          </p>
+        </CardHeader>
+        <CardContent>
+          {assignedWorkerNames.length > 0 ? (
+            <>
+              {/* Worker tabs for preview */}
+              <div className="flex items-center gap-3 mb-4">
+                <Label className="text-sm text-slate-600 shrink-0">プレビュー対象：</Label>
+                <div className="flex flex-wrap gap-2">
+                  {assignedWorkerNames.map((name) => (
+                    <Button
+                      key={name}
+                      variant={previewWorkerName === name ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedPreviewWorker(name)}
+                      className={previewWorkerName === name ? "bg-blue-600 hover:bg-blue-700" : ""}
+                    >
+                      {name}
+                      <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs bg-white/20">
+                        {getWorkerAssignedSites(name).length}
+                      </Badge>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Email preview */}
+              {previewWorkerName && (
+                <div className="border rounded-lg overflow-hidden">
+                  {/* Email header */}
+                  <div className="bg-slate-50 border-b px-4 py-3 flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-500">宛先：</span>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {previewWorkerName}さん
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-slate-500" />
+                      <span className="text-sm text-slate-500">件名：</span>
+                      <span className="text-sm font-medium text-slate-900">明日の予定です</span>
+                    </div>
+                  </div>
+                  {/* Email body */}
+                  <div className="max-h-[400px] overflow-y-auto p-6 bg-white">
+                    <pre
+                      className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed"
+                      style={{ fontFamily: "'Courier New', Courier, monospace" }}
+                    >
+                      {generateEmailContent(previewWorkerName)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="border rounded-lg p-12 bg-slate-50 text-center">
+              <Mail className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500">現場に作業員を割り当てると、メール内容がここに表示されます。</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Navigation */}
       <div className="flex items-center justify-between pt-4">
         <Button variant="outline" onClick={() => router.push("/dashboard")}>
@@ -421,7 +478,7 @@ function ShiftNotificationContent() {
           className="bg-blue-600 hover:bg-blue-700 text-white px-8"
           onClick={() => router.push("/shift-notification/send")}
         >
-          メール確認へ進む
+          送信画面へ進む
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
@@ -431,7 +488,7 @@ function ShiftNotificationContent() {
 
 export default function ShiftNotificationPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="animate-pulse space-y-6"><div className="h-8 w-96 bg-slate-200 rounded" /><div className="h-14 bg-blue-50 rounded-lg" /><div className="h-48 bg-slate-100 rounded-lg" /><div className="h-64 bg-slate-100 rounded-lg" /></div>}>
       <ShiftNotificationContent />
     </Suspense>
   )

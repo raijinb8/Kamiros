@@ -7,18 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Info, Send, Mail, CheckCircle2, FileText, AlertCircle, ChevronLeft, Users } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
+import { BulkSendConfirmDialog, TemplateEditDialog } from "@/components/shift-send-dialogs"
 
 function ShiftNotificationSendContent() {
   const router = useRouter()
@@ -349,72 +341,33 @@ ${site.details}
         )}
       </div>
 
-      {/* Confirm Modal */}
-      <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>一括送信の確認</DialogTitle>
-            <DialogDescription>
-              本当に{unsentCount}名の作業員に連絡メールを一斉送信しますか？この操作は取り消せません。
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsConfirmModalOpen(false)}>
-              キャンセル
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleBulkSend}>
-              送信を実行する
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Lazy-loaded Dialogs */}
+      {isConfirmModalOpen && (
+        <BulkSendConfirmDialog
+          open={isConfirmModalOpen}
+          onOpenChange={setIsConfirmModalOpen}
+          unsentCount={unsentCount}
+          onConfirm={handleBulkSend}
+        />
+      )}
+      {isTemplateModalOpen && (
+        <TemplateEditDialog
+          open={isTemplateModalOpen}
+          onOpenChange={setIsTemplateModalOpen}
+          templateHeader={templateHeader}
+          onTemplateHeaderChange={setTemplateHeader}
+          templateFooter={templateFooter}
+          onTemplateFooterChange={setTemplateFooter}
+        />
+      )}
 
-      {/* Template Edit Modal */}
-      <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>メールテンプレートを編集</DialogTitle>
-            <DialogDescription>メールのヘッダーとフッターをカスタマイズできます。</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="template-header">ヘッダー（本文の前に追加）</Label>
-              <Textarea
-                id="template-header"
-                value={templateHeader}
-                onChange={(e) => setTemplateHeader(e.target.value)}
-                placeholder="例：お疲れ様です。明日の予定をお知らせします。"
-                rows={3}
-              />
-            </div>
-            <div>
-              <Label htmlFor="template-footer">フッター（本文の後に追加）</Label>
-              <Textarea
-                id="template-footer"
-                value={templateFooter}
-                onChange={(e) => setTemplateFooter(e.target.value)}
-                placeholder="例：よろしくお願いいたします。"
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
-              キャンセル
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsTemplateModalOpen(false)}>
-              保存
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
 
 export default function ShiftNotificationSendPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="animate-pulse space-y-6"><div className="h-8 w-96 bg-slate-200 rounded" /><div className="h-14 bg-blue-50 rounded-lg" /><div className="h-64 bg-slate-100 rounded-lg" /></div>}>
       <ShiftNotificationSendContent />
     </Suspense>
   )
