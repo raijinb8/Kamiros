@@ -1,17 +1,18 @@
 "use client"
 
 import { Suspense } from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Info, Calendar, Clock, Users, Search, Filter, ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
+import { SiteAssignmentRow } from "@/components/site-assignment-row"
 
 // Time filter options
 const timeFilters = [
@@ -151,17 +152,12 @@ function ShiftNotificationContent() {
     setCurrentPage(1)
   }
 
-  const getAvailableWorkersForSlot = (siteId: string, slotIndex: number) => {
-    const site = sites.find((s) => s.id === siteId)
-    if (!site) return workers
-
-    const assignedInSite = site.assignedWorkers.filter((w, idx) => w !== null && idx !== slotIndex)
-    return workers.filter((worker) => !assignedInSite.includes(worker.name))
-  }
-
-  const handleWorkerChange = (siteId: string, slotIndex: number, value: string) => {
-    assignWorkerToSite(siteId, slotIndex, value === "none" ? null : value)
-  }
+  const handleWorkerChange = useCallback(
+    (siteId: string, slotIndex: number, value: string) => {
+      assignWorkerToSite(siteId, slotIndex, value === "none" ? null : value)
+    },
+    [assignWorkerToSite],
+  )
 
   return (
     <div className="space-y-6">
@@ -327,59 +323,14 @@ function ShiftNotificationContent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedSites.map((site) => {
-                  const status = getAssignmentStatus(site.assignedWorkers)
-                  return (
-                    <TableRow
-                      key={site.id}
-                      className={
-                        status === "assigned" ? "bg-green-50/50" : status === "partial" ? "bg-yellow-50/50" : "bg-white"
-                      }
-                    >
-                      <TableCell className="font-medium text-slate-900">{site.time}</TableCell>
-                      <TableCell className="text-slate-700 font-medium">{site.siteName}</TableCell>
-                      <TableCell className="text-slate-600">{site.tradingPartner}</TableCell>
-                      <TableCell className="text-slate-600 text-sm">{site.address}</TableCell>
-                      {Array.from({ length: 4 }).map((_, slotIndex) => {
-                        if (slotIndex >= site.requiredWorkers) {
-                          return (
-                            <TableCell key={slotIndex}>
-                              <div className="h-9 bg-slate-100 rounded-md flex items-center justify-center text-slate-400 text-sm">
-                                —
-                              </div>
-                            </TableCell>
-                          )
-                        }
-
-                        const availableWorkers = getAvailableWorkersForSlot(site.id, slotIndex)
-                        const currentValue = site.assignedWorkers[slotIndex]
-
-                        return (
-                          <TableCell key={slotIndex}>
-                            <Select
-                              value={currentValue || "none"}
-                              onValueChange={(value) => handleWorkerChange(site.id, slotIndex, value)}
-                            >
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="選択してください" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none" className="text-slate-400">
-                                  選択してください
-                                </SelectItem>
-                                {availableWorkers.map((worker) => (
-                                  <SelectItem key={worker.id} value={worker.name}>
-                                    {worker.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                        )
-                      })}
-                    </TableRow>
-                  )
-                })}
+                {paginatedSites.map((site) => (
+                  <SiteAssignmentRow
+                    key={site.id}
+                    site={site}
+                    allWorkers={workers}
+                    onWorkerChange={handleWorkerChange}
+                  />
+                ))}
               </TableBody>
             </Table>
           </div>
