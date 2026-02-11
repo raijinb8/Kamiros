@@ -723,20 +723,18 @@ function FaxInboxContent() {
               </Button>
             </div>
           </div>
-          <div className="flex-1 overflow-auto p-4 flex items-start justify-center">
+          <div className="flex-1 overflow-auto flex items-start justify-center">
             <div
-              className="bg-white shadow-md transition-transform duration-300 ease-in-out"
+              className="w-full h-full transition-transform duration-300 ease-in-out"
               style={{
                 transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                 transformOrigin: "center center",
-                width: "595px",
-                minHeight: "842px",
               }}
             >
-              <img
-                src="/japanese-fax-document-with-construction-site-detai.jpg"
-                alt="FAX Document Preview"
-                className="w-full h-auto"
+              <iframe
+                src="/sample-fax.pdf"
+                title="FAX Document Preview"
+                className="w-full h-full border-0"
               />
             </div>
           </div>
