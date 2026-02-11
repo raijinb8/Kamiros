@@ -328,8 +328,7 @@ function FormField({
 
 function FaxInboxContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  
+
   // FAX list state
   const [faxList, setFaxList] = useState<FaxItem[]>(dummyFaxList)
   const [selectedFaxId, setSelectedFaxId] = useState<number>(dummyFaxList[0].id)
@@ -850,7 +849,7 @@ function FaxInboxContent() {
               </FormField>
 
               {/* 11. Walking Distance */}
-              <FormField label="現場住所から最寄り駅までの徒歩距離">
+              <FormField label="現場住所から最寄り駅までの徒歩距��">
                 <div className="flex items-center gap-2">
                   <Input
                     value={formData.walkingDistance}
