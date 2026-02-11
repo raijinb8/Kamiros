@@ -63,6 +63,7 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
