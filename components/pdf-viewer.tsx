@@ -7,11 +7,8 @@ import "react-pdf/dist/esm/Page/TextLayer.css"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// Configure PDF.js worker using CDN with correct path for v4+
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url,
-).toString()
+// Configure PDF.js worker via CDN
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`
 
 interface PdfViewerProps {
   file: string
