@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select"
 import {
   Calendar as CalendarIcon, Search, FileSpreadsheet, Plus, MapPin, FileText,
-  Pencil, Loader2, Clock, Users, Sun, Moon, AlertTriangle, CheckCircle,
+  Pencil, Loader2, Clock, Users, Sun, Moon, AlertTriangle, CheckCircle, Target, Edit2,
 } from "lucide-react"
 import { toast, Toaster } from "sonner"
 
@@ -120,7 +120,7 @@ function isAmSlot(slot: TimeSlot): boolean {
 const DAILY_SHIFT_SUPPLY: Record<string, ShiftSupply> = {
   "2026-02-01": { am: 10, pm: 8 },
   "2026-02-02": { am: 25, pm: 20 },
-  "2026-02-03": { am: 40, pm: 35 },  // PM shortage scenario
+  "2026-02-03": { am: 60, pm: 50 },  // AM=55 assigned (Safe), PM=75 assigned (DANGER)
   "2026-02-04": { am: 12, pm: 10 },
   "2026-02-05": { am: 15, pm: 12 },
   "2026-02-10": { am: 20, pm: 18 },
@@ -144,25 +144,27 @@ const DAILY_DATA: Record<string, ProjectRow[]> = {
     { id: "2-4", slot: "13:00", time: "13:00", clientName: "加藤ベニヤ本社", contactPerson: "高橋様", siteAddress: "目黒区八雲1-10-8", mapUrl: "https://www.google.com/maps/search/目黒区八雲1-10-8", workers: 2, category: "ハーフ", categoryColor: "slate", assign: "Active", receivedDate: "1/28", notes: "午後開始、養生必須", pdfUrl: null, syncStatus: "synced" },
     { id: "2-5", slot: "14:00", time: "14:00", clientName: "中央設備", contactPerson: "木村様", siteAddress: "練馬区豊玉北5-3", mapUrl: "https://www.google.com/maps/search/練馬区豊玉北5-3", workers: 1, category: "常用", categoryColor: "blue", assign: "Omusubi", receivedDate: "1/29", notes: "", pdfUrl: null, syncStatus: "synced" },
   ],
-  // 2/3: PM Shortage Alert - AM assigned=38 (supply=40 Safe), PM assigned=42 (supply=35 DANGER)
+  // 2/3: Target=120, TotalWorkers=130, Outsourced=5workers (AG=3rows, Omusubi=2rows), InternalLoad=125 => OVER by 5
+  // AM: supply=40, PM: supply=35
   "2026-02-03": [
-    // --- AM block: 8 orders, 38 workers total ---
-    { id: "3-1", slot: "early", time: "06:30", clientName: "早朝建材(株)", contactPerson: "早川様", siteAddress: "足立区千住1-4", mapUrl: "https://www.google.com/maps/search/足立区千住1-4", workers: 3, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/18", notes: "早朝搬入", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-2", slot: "08:00", time: "08:00", clientName: "(株)山田工務店", contactPerson: "鈴木担当", siteAddress: "戸田市喜沢南1-5-12", mapUrl: "https://www.google.com/maps/search/戸田市喜沢南1-5-12", workers: 6, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/20", notes: "4名手元、2名解体", pdfUrl: "/sample-fax.pdf", syncStatus: "synced" },
-    { id: "3-3", slot: "08:00", time: "08:00", clientName: "富士建材", contactPerson: "石川様", siteAddress: "文京区本郷3-2-7", mapUrl: "https://www.google.com/maps/search/文京区本郷3-2-7", workers: 4, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/22", notes: "終日", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-4", slot: "08:00", time: "08:30", clientName: "株式会社アクティブ", contactPerson: "田中様", siteAddress: "川口市並木2-10", mapUrl: "https://www.google.com/maps/search/川口市並木2-10", workers: 3, category: "常用", categoryColor: "blue", assign: "AG", receivedDate: "1/23", notes: "ヘルメット持参", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-5", slot: "10:00", time: "10:00", clientName: "大和ハウス工業", contactPerson: "中田様", siteAddress: "板橋区成増3-12-1", mapUrl: "https://www.google.com/maps/search/板橋区成増3-12-1", workers: 8, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/25", notes: "終日作業、大型搬入あり", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-6", slot: "10:00", time: "10:00", clientName: "鈴木建設", contactPerson: "佐藤様", siteAddress: "さいたま市浦和区高砂3-1", mapUrl: "https://www.google.com/maps/search/さいたま市浦和区高砂3-1", workers: 5, category: "手間", categoryColor: "orange", assign: "AG", receivedDate: "1/24", notes: "駐車場なし", pdfUrl: "/sample-fax.pdf", syncStatus: "unsynced" },
-    { id: "3-7", slot: "10:00", time: "10:00", clientName: "三井住友建設", contactPerson: "大塚様", siteAddress: "千代田区丸の内1-1", mapUrl: "https://www.google.com/maps/search/千代田区丸の内1-1", workers: 5, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/26", notes: "大型搬入あり", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-8", slot: "10:00", time: "10:30", clientName: "中野建工", contactPerson: "中野様", siteAddress: "中野区中央4-1", mapUrl: "https://www.google.com/maps/search/中野区中央4-1", workers: 4, category: "UB", categoryColor: "emerald", assign: "Active", receivedDate: "1/27", notes: "", pdfUrl: null, syncStatus: "synced" },
-    // --- PM block: 7 orders, 42 workers total (EXCEEDS 35 supply!) ---
-    { id: "3-9", slot: "13:00", time: "13:00", clientName: "ジューテック開発", contactPerson: "稲村様", siteAddress: "横浜市神奈川区六角橋2-8", mapUrl: "https://www.google.com/maps/search/横浜市神奈川区六角橋2-8", workers: 8, category: "UB", categoryColor: "emerald", assign: "Active", receivedDate: "1/24", notes: "AG3・HM3", pdfUrl: "/sample-fax.pdf", syncStatus: "synced" },
-    { id: "3-10", slot: "13:00", time: "13:00", clientName: "東急建設(株)", contactPerson: "斉藤様", siteAddress: "渋谷区桜丘町26-1", mapUrl: "https://www.google.com/maps/search/渋谷区桜丘町26-1", workers: 6, category: "常用", categoryColor: "blue", assign: "AF", receivedDate: "1/28", notes: "午後開始", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-11", slot: "14:00", time: "14:00", clientName: "加藤ベニヤ本社", contactPerson: "高橋様", siteAddress: "目黒区八雲1-10-8", mapUrl: "https://www.google.com/maps/search/目黒区八雲1-10-8", workers: 7, category: "ハーフ", categoryColor: "slate", assign: "Active", receivedDate: "1/26", notes: "養生必須", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-12", slot: "15:00", time: "15:00", clientName: "大成木材", contactPerson: "島田様", siteAddress: "世田谷区代田4-2-6", mapUrl: "https://www.google.com/maps/search/世田谷区代田4-2-6", workers: 5, category: "内装材", categoryColor: "rose", assign: "Active", receivedDate: "1/27", notes: "", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-13", slot: "15:00", time: "15:30", clientName: "横浜港運(株)", contactPerson: "松田様", siteAddress: "横浜市中区海岸通1", mapUrl: "https://www.google.com/maps/search/横浜市中区海岸通1", workers: 6, category: "常用", categoryColor: "blue", assign: "Omusubi", receivedDate: "1/29", notes: "倉庫搬入", pdfUrl: null, syncStatus: "synced" },
-    { id: "3-14", slot: "16:00", time: "16:00", clientName: "中央設備", contactPerson: "木村様", siteAddress: "練馬区豊玉北5-3", mapUrl: "https://www.google.com/maps/search/練馬区豊玉北5-3", workers: 5, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/28", notes: "搬入のみ", pdfUrl: "/sample-fax.pdf", syncStatus: "unsynced" },
-    { id: "3-15", slot: "16:00", time: "16:30", clientName: "夕方建材", contactPerson: "山本様", siteAddress: "豊島区東池袋3-1", mapUrl: "https://www.google.com/maps/search/豊島区東池袋3-1", workers: 5, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/30", notes: "夕方搬入", pdfUrl: null, syncStatus: "synced" },
+    // --- AM block: 8 orders, 55 workers ---
+    { id: "3-1", slot: "early", time: "06:30", clientName: "早朝建材(株)", contactPerson: "早川様", siteAddress: "足立区千住1-4", mapUrl: "https://www.google.com/maps/search/足立区千住1-4", workers: 4, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/18", notes: "早朝搬入", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-2", slot: "08:00", time: "08:00", clientName: "(株)山田工務店", contactPerson: "鈴木担当", siteAddress: "戸田市喜沢南1-5-12", mapUrl: "https://www.google.com/maps/search/戸田市喜沢南1-5-12", workers: 8, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/20", notes: "4名手元、4名解体", pdfUrl: "/sample-fax.pdf", syncStatus: "synced" },
+    { id: "3-3", slot: "08:00", time: "08:00", clientName: "富士建材", contactPerson: "石川様", siteAddress: "文京区本郷3-2-7", mapUrl: "https://www.google.com/maps/search/文京区本郷3-2-7", workers: 6, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/22", notes: "終日", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-4", slot: "08:00", time: "08:30", clientName: "株式会社アクティブ", contactPerson: "田中様", siteAddress: "川口市並木2-10", mapUrl: "https://www.google.com/maps/search/川口市並木2-10", workers: 1, category: "常用", categoryColor: "blue", assign: "AG", receivedDate: "1/23", notes: "ヘルメット持参", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-5", slot: "10:00", time: "10:00", clientName: "大和ハウス工業", contactPerson: "中田様", siteAddress: "板橋区成増3-12-1", mapUrl: "https://www.google.com/maps/search/板橋区成増3-12-1", workers: 12, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/25", notes: "終日作業、大型搬入あり", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-6", slot: "10:00", time: "10:00", clientName: "鈴木建設", contactPerson: "佐藤様", siteAddress: "さいたま市浦和区高砂3-1", mapUrl: "https://www.google.com/maps/search/さいたま市浦和区高砂3-1", workers: 2, category: "手間", categoryColor: "orange", assign: "AG", receivedDate: "1/24", notes: "駐車場なし", pdfUrl: "/sample-fax.pdf", syncStatus: "unsynced" },
+    { id: "3-7", slot: "10:00", time: "10:00", clientName: "三井住友建設", contactPerson: "大塚様", siteAddress: "千代田区丸の内1-1", mapUrl: "https://www.google.com/maps/search/千代田区丸の内1-1", workers: 10, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/26", notes: "大型搬入あり", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-8", slot: "10:00", time: "10:30", clientName: "中野建工", contactPerson: "中野様", siteAddress: "中野区中央4-1", mapUrl: "https://www.google.com/maps/search/中野区中央4-1", workers: 12, category: "UB", categoryColor: "emerald", assign: "Active", receivedDate: "1/27", notes: "", pdfUrl: null, syncStatus: "synced" },
+    // --- PM block: 7 orders, 75 workers ---
+    { id: "3-9", slot: "13:00", time: "13:00", clientName: "ジューテック開発", contactPerson: "稲村様", siteAddress: "横浜市神奈川区六角橋2-8", mapUrl: "https://www.google.com/maps/search/横浜市神奈川区六角橋2-8", workers: 12, category: "UB", categoryColor: "emerald", assign: "Active", receivedDate: "1/24", notes: "AG3・HM3", pdfUrl: "/sample-fax.pdf", syncStatus: "synced" },
+    { id: "3-10", slot: "13:00", time: "13:00", clientName: "東急建設(株)", contactPerson: "斉藤様", siteAddress: "渋谷区桜丘町26-1", mapUrl: "https://www.google.com/maps/search/渋谷区桜丘町26-1", workers: 10, category: "常用", categoryColor: "blue", assign: "AG", receivedDate: "1/28", notes: "午後開始", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-11", slot: "14:00", time: "14:00", clientName: "加藤ベニヤ本社", contactPerson: "高橋様", siteAddress: "目黒区八雲1-10-8", mapUrl: "https://www.google.com/maps/search/目黒区八雲1-10-8", workers: 12, category: "ハーフ", categoryColor: "slate", assign: "Active", receivedDate: "1/26", notes: "養生必須", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-12", slot: "15:00", time: "15:00", clientName: "大成木材", contactPerson: "島田様", siteAddress: "世田谷区代田4-2-6", mapUrl: "https://www.google.com/maps/search/世田谷区代田4-2-6", workers: 10, category: "内装材", categoryColor: "rose", assign: "Active", receivedDate: "1/27", notes: "", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-13", slot: "15:00", time: "15:30", clientName: "横浜港運(株)", contactPerson: "松田様", siteAddress: "横浜市中区海岸通1", mapUrl: "https://www.google.com/maps/search/横浜市中区海岸通1", workers: 1, category: "常用", categoryColor: "blue", assign: "Omusubi", receivedDate: "1/29", notes: "倉庫搬入", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-14", slot: "16:00", time: "16:00", clientName: "中央設備", contactPerson: "木村様", siteAddress: "練馬区豊玉北5-3", mapUrl: "https://www.google.com/maps/search/練馬区豊玉北5-3", workers: 14, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/28", notes: "搬入のみ", pdfUrl: "/sample-fax.pdf", syncStatus: "unsynced" },
+    { id: "3-15", slot: "16:00", time: "16:30", clientName: "夕方建材", contactPerson: "山本様", siteAddress: "豊島区東池袋3-1", mapUrl: "https://www.google.com/maps/search/豊島区東池袋3-1", workers: 15, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/30", notes: "夕方搬入", pdfUrl: null, syncStatus: "synced" },
+    { id: "3-16", slot: "night", time: "21:00", clientName: "夜間搬入(株)", contactPerson: "夜間担当", siteAddress: "港区芝浦3-4-1", mapUrl: "https://www.google.com/maps/search/港区芝浦3-4-1", workers: 1, category: "常用", categoryColor: "blue", assign: "Omusubi", receivedDate: "1/31", notes: "夜間搬入", pdfUrl: null, syncStatus: "synced" },
   ],
   "2026-02-04": [
     { id: "4-1", slot: "08:00", time: "08:00", clientName: "富士建材", contactPerson: "石川様", siteAddress: "文京区本郷3-2-7", mapUrl: "https://www.google.com/maps/search/文京区本郷3-2-7", workers: 2, category: "常用", categoryColor: "blue", assign: "Active", receivedDate: "1/30", notes: "午前中", pdfUrl: null, syncStatus: "synced" },
@@ -186,24 +188,33 @@ const DAILY_DATA: Record<string, ProjectRow[]> = {
 function computeMetrics(data: ProjectRow[], supply: ShiftSupply | null) {
   const slotCounts: Record<TimeSlot, number> = { early: 0, "08:00": 0, "10:00": 0, "13:00": 0, "14:00": 0, "15:00": 0, "16:00": 0, night: 0 }
   const outsourced: Record<string, number> = { AG: 0, AF: 0, AA: 0, HM: 0, Omusubi: 0 }
-  let amWorkers = 0, pmWorkers = 0
+  let amWorkers = 0, pmWorkers = 0, totalWorkers = 0
+  let outsourcedWorkers = 0
 
   for (const row of data) {
     slotCounts[row.slot]++
+    totalWorkers += row.workers
     if (isAmSlot(row.slot)) amWorkers += row.workers
     else pmWorkers += row.workers
-    if (row.assign !== "Active" && row.assign in outsourced) outsourced[row.assign]++
+    if (row.assign !== "Active" && row.assign in outsourced) {
+      outsourced[row.assign]++
+      outsourcedWorkers += row.workers
+    }
   }
 
   const totalOutsourced = Object.values(outsourced).reduce((a, b) => a + b, 0)
+  const internalLoad = totalWorkers - outsourcedWorkers
   const amAvailable = supply?.am ?? 0
   const pmAvailable = supply?.pm ?? 0
 
   return {
     totalOrders: data.length,
+    totalWorkers,
     slotCounts,
     outsourced,
     totalOutsourced,
+    outsourcedWorkers,
+    internalLoad,
     activeInternal: data.length - totalOutsourced,
     amWorkers, pmWorkers,
     amAvailable, pmAvailable,
@@ -432,6 +443,9 @@ function ProjectsContent() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [editRow, setEditRow] = useState<ProjectRow | null>(null)
   const [dataStore, setDataStore] = useState(DAILY_DATA)
+  const [targetManpower, setTargetManpower] = useState(120)
+  const [targetInput, setTargetInput] = useState("120")
+  const [targetPopoverOpen, setTargetPopoverOpen] = useState(false)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const selectedTabRef = useRef<HTMLDivElement>(null)
@@ -463,6 +477,17 @@ function ProjectsContent() {
   const currentData = dataStore[key] || []
   const supply = DAILY_SHIFT_SUPPLY[key] || null
   const m = computeMetrics(currentData, supply)
+  const targetGap = targetManpower - m.internalLoad
+  const isOverCapacity = targetGap < 0
+
+  const handleSaveTarget = useCallback(() => {
+    const parsed = parseInt(targetInput, 10)
+    if (!isNaN(parsed) && parsed > 0) {
+      setTargetManpower(parsed)
+      setTargetPopoverOpen(false)
+      toast.success(`目標人工を ${parsed}名 に設定しました`)
+    }
+  }, [targetInput])
 
   // Sort by slot then time
   const sortedData = [...currentData].sort((a, b) => {
@@ -580,7 +605,83 @@ function ProjectsContent() {
 
             <div className="w-px bg-slate-700 self-stretch mx-2" />
 
-            {/* Section C: Shift Availability & Balance */}
+            {/* Section C: Active Internal Target (EDITABLE) */}
+            <div className="flex items-center gap-3 px-4 py-1">
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-800 shrink-0">
+                <Target className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">目標人工</p>
+                  <Popover open={targetPopoverOpen} onOpenChange={(open) => { setTargetPopoverOpen(open); if (open) setTargetInput(String(targetManpower)) }}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-600 text-sm font-bold text-blue-300 tabular-nums"
+                      >
+                        {targetManpower}名
+                        <Edit2 className="h-3 w-3 text-slate-400" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-3" align="start">
+                      <p className="text-xs font-medium text-slate-600 mb-2">本日の目標人工を設定</p>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          value={targetInput}
+                          onChange={(e) => setTargetInput(e.target.value)}
+                          className="h-8 text-sm"
+                          onKeyDown={(e) => { if (e.key === "Enter") handleSaveTarget() }}
+                        />
+                        <Button size="sm" className="h-8 bg-blue-600 hover:bg-blue-700 text-xs px-3" onClick={handleSaveTarget}>
+                          保存
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                {/* Current Load vs Target */}
+                <div className="flex items-center gap-3">
+                  <div className="text-center">
+                    <p className="text-[9px] text-slate-500 leading-none">自社負荷</p>
+                    <p className={`text-2xl font-bold tabular-nums leading-none mt-0.5 ${isOverCapacity ? "text-red-400" : "text-emerald-400"}`}>
+                      {m.internalLoad}
+                    </p>
+                  </div>
+                  <span className="text-slate-500 text-lg">/</span>
+                  <div className="text-center">
+                    <p className="text-[9px] text-slate-500 leading-none">目標</p>
+                    <p className="text-2xl font-bold tabular-nums leading-none mt-0.5 text-slate-200">
+                      {targetManpower}
+                    </p>
+                  </div>
+                </div>
+                {/* Gap summary */}
+                <div className="mt-1.5">
+                  {isOverCapacity ? (
+                    <div className="flex items-center gap-1 text-xs text-red-400 font-medium">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>{Math.abs(targetGap)}名 超過中</span>
+                    </div>
+                  ) : targetGap === 0 ? (
+                    <div className="flex items-center gap-1 text-xs text-amber-400 font-medium">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>ちょうど目標</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-xs text-emerald-400 font-medium">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>あと {targetGap}名 受注可能</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="w-px bg-slate-700 self-stretch mx-2" />
+
+            {/* Section D: Shift Availability & Balance */}
             <div className="flex items-center gap-4 px-4 py-1">
               <div>
                 <p className="text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">自社作業員 需給バランス</p>
