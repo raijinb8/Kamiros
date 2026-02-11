@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 import "react-pdf/dist/esm/Page/AnnotationLayer.css"
 import "react-pdf/dist/esm/Page/TextLayer.css"
@@ -39,6 +39,9 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
       })
   }, [file])
 
+  // Memoize the file object to avoid unnecessary re-renders
+  const fileData = useMemo(() => (pdfData ? { data: pdfData } : null), [pdfData])
+
   const onDocumentLoadSuccess = useCallback(
     ({ numPages }: { numPages: number }) => {
       setNumPages(numPages)
@@ -75,7 +78,7 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
           }}
         >
           <Document
-            file={{ data: pdfData }}
+            file={fileData}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={(error) => {
               setLoadError(error.message)
