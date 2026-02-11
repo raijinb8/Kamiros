@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Info, Calendar, Clock, Users, Search, Filter, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Info, Calendar, Clock, Users, Search, Filter, ChevronLeft, ChevronRight, ArrowRight, Mail } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
 
 // Time filter options
@@ -40,7 +41,39 @@ const assignmentStatusFilters = [
 
 function ShiftNotificationContent() {
   const router = useRouter()
-  const { selectedDate, setSelectedDate, sites, workers, assignWorkerToSite } = useShift()
+  const { selectedDate, setSelectedDate, sites, workers, assignWorkerToSite, getWorkerAssignedSites, getAssignedWorkersForSite } = useShift()
+
+  // Email preview state
+  const [selectedPreviewWorker, setSelectedPreviewWorker] = useState<string | null>(null)
+
+  // Workers that have at least one site assigned
+  const assignedWorkerNames = useMemo(() => {
+    const names = new Set<string>()
+    for (const site of sites) {
+      for (const w of site.assignedWorkers) {
+        if (w) names.add(w)
+      }
+    }
+    return Array.from(names)
+  }, [sites])
+
+  // Auto-select first assigned worker for preview
+  const previewWorkerName = selectedPreviewWorker && assignedWorkerNames.includes(selectedPreviewWorker)
+    ? selectedPreviewWorker
+    : assignedWorkerNames[0] || null
+
+  // Generate email content for a given worker
+  const generateEmailContent = (workerName: string) => {
+    const assignedSites = getWorkerAssignedSites(workerName)
+    if (assignedSites.length === 0) return null
+
+    const sections = assignedSites.map((site) => {
+      const assignedWorkers = getAssignedWorkersForSite(site.id)
+      return `${site.time}～\n${site.tradingPartner}　${site.contactPerson}\n${site.siteName}\n${site.details}\n班長：${assignedWorkers.join("、")}`
+    })
+
+    return sections.join("\n\n─────────────────────────────────\n\n")
+  }
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("")
@@ -197,7 +230,7 @@ function ShiftNotificationContent() {
           <div className="flex flex-wrap items-center gap-4">
             {/* Time Filter */}
             <div className="flex items-center gap-2">
-              <Label className="text-sm text-slate-600">時間帯</Label>
+              <Label className="text-sm text-slate-600">時間���</Label>
               <Select value={timeFilter} onValueChange={(v) => handleFilterChange(setTimeFilter, v)}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -410,6 +443,79 @@ function ShiftNotificationContent() {
         </CardContent>
       </Card>
 
+      {/* Section 4: Real-time Email Preview */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle className="text-slate-900 flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            メール内容確認（リアルタイム更新）
+          </CardTitle>
+          <p className="text-sm text-slate-500">
+            作業員を現場に割り当てると、送信されるメールの内容がリアルタイムで表示されます。
+          </p>
+        </CardHeader>
+        <CardContent>
+          {assignedWorkerNames.length > 0 ? (
+            <>
+              {/* Worker tabs for preview */}
+              <div className="flex items-center gap-3 mb-4">
+                <Label className="text-sm text-slate-600 shrink-0">プレビュー対象：</Label>
+                <div className="flex flex-wrap gap-2">
+                  {assignedWorkerNames.map((name) => (
+                    <Button
+                      key={name}
+                      variant={previewWorkerName === name ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedPreviewWorker(name)}
+                      className={previewWorkerName === name ? "bg-blue-600 hover:bg-blue-700" : ""}
+                    >
+                      {name}
+                      <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs bg-white/20">
+                        {getWorkerAssignedSites(name).length}
+                      </Badge>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Email preview */}
+              {previewWorkerName && (
+                <div className="border rounded-lg overflow-hidden">
+                  {/* Email header */}
+                  <div className="bg-slate-50 border-b px-4 py-3 flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-500">宛先：</span>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {previewWorkerName}さん
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-slate-500" />
+                      <span className="text-sm text-slate-500">件名：</span>
+                      <span className="text-sm font-medium text-slate-900">明日の予定です</span>
+                    </div>
+                  </div>
+                  {/* Email body */}
+                  <div className="max-h-[400px] overflow-y-auto p-6 bg-white">
+                    <pre
+                      className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed"
+                      style={{ fontFamily: "'Courier New', Courier, monospace" }}
+                    >
+                      {generateEmailContent(previewWorkerName)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="border rounded-lg p-12 bg-slate-50 text-center">
+              <Mail className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500">現場に作業員を割り当てると、メール内容がここに表示されます。</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Navigation */}
       <div className="flex items-center justify-between pt-4">
         <Button variant="outline" onClick={() => router.push("/dashboard")}>
@@ -421,7 +527,7 @@ function ShiftNotificationContent() {
           className="bg-blue-600 hover:bg-blue-700 text-white px-8"
           onClick={() => router.push("/shift-notification/send")}
         >
-          メール確認へ進む
+          送信画面へ進む
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
