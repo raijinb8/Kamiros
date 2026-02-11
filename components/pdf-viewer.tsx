@@ -69,12 +69,12 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-auto flex justify-center p-4">
+      <div className="flex-1 overflow-auto flex items-center justify-center p-4">
         <div
           className="transition-transform duration-300 ease-in-out"
           style={{
             transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-            transformOrigin: "top center",
+            transformOrigin: "center center",
           }}
         >
           <Document
