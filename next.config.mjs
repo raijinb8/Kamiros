@@ -3,7 +3,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  reactCompiler: true,
   experimental: {
     optimizePackageImports: ["lucide-react", "react-pdf"],
   },
