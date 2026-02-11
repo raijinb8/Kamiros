@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, memo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Home, Inbox, Send, Settings } from "lucide-react"
@@ -60,7 +60,7 @@ function SidebarNav() {
   )
 }
 
-export function Sidebar() {
+export const Sidebar = memo(function Sidebar() {
   const { isCollapsed } = useSidebar()
 
   return (
@@ -75,4 +75,4 @@ export function Sidebar() {
       </Suspense>
     </aside>
   )
-}
+})

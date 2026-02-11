@@ -2,23 +2,25 @@
 
 import { Suspense } from "react"
 import { useState, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Info, Send, Mail, CheckCircle2, FileText, AlertCircle, ChevronLeft, Users } from "lucide-react"
 import { useShift } from "@/lib/shift-context"
+
+// Lazy-load heavy dialog components
+const BulkSendConfirmDialog = dynamic(
+  () => import("@/components/shift-send-dialogs").then((mod) => ({ default: mod.BulkSendConfirmDialog })),
+  { ssr: false },
+)
+const TemplateEditDialog = dynamic(
+  () => import("@/components/shift-send-dialogs").then((mod) => ({ default: mod.TemplateEditDialog })),
+  { ssr: false },
+)
 
 function ShiftNotificationSendContent() {
   const router = useRouter()
@@ -349,25 +351,25 @@ ${site.details}
         )}
       </div>
 
-      {/* Confirm Modal */}
-      <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>一括送信の確認</DialogTitle>
-            <DialogDescription>
-              本当に{unsentCount}名の作業員に連絡メールを一斉送信しますか？この操作は取り消せません。
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsConfirmModalOpen(false)}>
-              キャンセル
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleBulkSend}>
-              送信を実行する
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Lazy-loaded Dialogs */}
+      {isConfirmModalOpen && (
+        <BulkSendConfirmDialog
+          open={isConfirmModalOpen}
+          onOpenChange={setIsConfirmModalOpen}
+          unsentCount={unsentCount}
+          onConfirm={handleBulkSend}
+        />
+      )}
+      {isTemplateModalOpen && (
+        <TemplateEditDialog
+          open={isTemplateModalOpen}
+          onOpenChange={setIsTemplateModalOpen}
+          templateHeader={templateHeader}
+          onTemplateHeaderChange={setTemplateHeader}
+          templateFooter={templateFooter}
+          onTemplateFooterChange={setTemplateFooter}
+        />
+      )}
 
       {/* Template Edit Modal */}
       <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
@@ -414,7 +416,7 @@ ${site.details}
 
 export default function ShiftNotificationSendPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="animate-pulse space-y-6"><div className="h-8 w-96 bg-slate-200 rounded" /><div className="h-14 bg-blue-50 rounded-lg" /><div className="h-64 bg-slate-100 rounded-lg" /></div>}>
       <ShiftNotificationSendContent />
     </Suspense>
   )

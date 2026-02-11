@@ -488,7 +488,7 @@ function ShiftNotificationContent() {
 
 export default function ShiftNotificationPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="animate-pulse space-y-6"><div className="h-8 w-96 bg-slate-200 rounded" /><div className="h-14 bg-blue-50 rounded-lg" /><div className="h-48 bg-slate-100 rounded-lg" /><div className="h-64 bg-slate-100 rounded-lg" /></div>}>
       <ShiftNotificationContent />
     </Suspense>
   )

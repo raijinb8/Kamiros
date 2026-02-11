@@ -1,18 +1,11 @@
 "use client"
 
 import { useState, useCallback, Suspense } from "react"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import {
   Select,
   SelectContent,
@@ -20,10 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, ChevronLeft, ChevronRight, X, CheckCircle2, PanelLeftClose, PanelLeftOpen, ZoomIn, ZoomOut, RotateCw } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, X, PanelLeftClose, PanelLeftOpen, ZoomIn, ZoomOut, RotateCw } from "lucide-react"
 import { PdfViewer } from "@/components/pdf-viewer"
 import { FaxDetailForm } from "@/components/fax-detail-form"
+import { FaxListItem } from "@/components/fax-list-item"
 import { dummyFaxList, faxToFormData, type FaxItem, type FaxStatus, type FaxFormData } from "@/lib/fax-data"
+
+// Lazy-load the heavy confirmation dialog
+const FaxConfirmDialog = dynamic(() => import("@/components/fax-confirm-dialog"), { ssr: false })
 
 function FaxInboxContent() {
   const router = useRouter()
@@ -65,6 +62,8 @@ function FaxInboxContent() {
 
   // FAX list panel state (closed by default)
   const [isFaxListOpen, setIsFaxListOpen] = useState(false)
+
+  const closeFaxList = useCallback(() => setIsFaxListOpen(false), [])
 
   const resetPreview = useCallback(() => {
     setZoom(100)
@@ -130,22 +129,6 @@ function FaxInboxContent() {
       }
     }
   }, [currentFaxIndex, filteredFaxList, handleSelectFax, startIndex, itemsPerPage])
-
-  const getStatusBadge = (status: FaxStatus) => {
-    switch (status) {
-      case "unconfirmed":
-        return <Badge variant="secondary" className="bg-slate-100 text-slate-600">未確認</Badge>
-      case "confirmed":
-        return <Badge variant="secondary" className="bg-amber-100 text-amber-700">確認済</Badge>
-      case "finalized":
-        return <Badge variant="secondary" className="bg-green-100 text-green-700">確定済</Badge>
-    }
-  }
-
-  const formatDateTime = (dateTime: string) => {
-    const date = new Date(dateTime)
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`
-  }
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col relative">
@@ -249,40 +232,13 @@ function FaxInboxContent() {
           {/* FAX List */}
           <div className="flex-1 overflow-auto" style={{ height: "calc(100% - 280px)" }}>
             {paginatedFaxList.map((fax) => (
-              <div
+              <FaxListItem
                 key={fax.id}
-                className={`p-3 border-b border-slate-100 cursor-pointer transition-colors ${
-                  fax.id === selectedFaxId
-                    ? "bg-blue-50 border-l-4 border-l-blue-600"
-                    : "hover:bg-slate-50 border-l-4 border-l-transparent"
-                }`}
-                onClick={() => {
-                  handleSelectFax(fax)
-                  setIsFaxListOpen(false)
-                }}
-              >
-                <div className="flex items-start gap-2">
-                  <div className="mt-0.5">
-                    {fax.status === "finalized" ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <div
-                        className={`h-4 w-4 rounded border-2 ${
-                          fax.status === "confirmed" ? "border-amber-400 bg-amber-100" : "border-slate-300"
-                        }`}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="text-xs text-slate-500">{formatDateTime(fax.dateTime)}</span>
-                      {getStatusBadge(fax.status)}
-                    </div>
-                    <p className="text-sm font-medium text-slate-700 truncate">{fax.tradingPartner}</p>
-                    <p className="text-sm text-slate-600 truncate">{fax.siteName}</p>
-                  </div>
-                </div>
-              </div>
+                fax={fax}
+                isSelected={fax.id === selectedFaxId}
+                onSelect={handleSelectFax}
+                onClose={closeFaxList}
+              />
             ))}
           </div>
 
@@ -409,23 +365,14 @@ function FaxInboxContent() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
-      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>FAXを確定しますか？</DialogTitle>
-            <DialogDescription>このFAXを確定して、基幹システムへ送信しますか？</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmModal(false)}>
-              キャンセル
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleConfirmAndSend}>
-              送信を実行する
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Confirmation Modal - lazy loaded */}
+      {showConfirmModal && (
+        <FaxConfirmDialog
+          open={showConfirmModal}
+          onOpenChange={setShowConfirmModal}
+          onConfirm={handleConfirmAndSend}
+        />
+      )}
     </div>
   )
 }
