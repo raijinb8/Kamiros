@@ -3,7 +3,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  reactCompiler: false,
 }
 
 export default nextConfig
