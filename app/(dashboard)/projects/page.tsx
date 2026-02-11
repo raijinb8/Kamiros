@@ -27,6 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
 import {
   Calendar as CalendarIcon,
   Search,
@@ -38,6 +39,11 @@ import {
   Pencil,
   Trash2,
   Loader2,
+  Target,
+  Users,
+  Clock,
+  TrendingUp,
+  AlertCircle,
 } from "lucide-react"
 import { toast, Toaster } from "sonner"
 
@@ -123,6 +129,31 @@ const DAILY_DATA: Record<string, ProjectRow[]> = {
     { id: "10-2", time: "09:00", clientName: "大和ハウス工業", contactPerson: "中田様", siteAddress: "渋谷区道玄坂1-12", mapUrl: "https://www.google.com/maps/search/渋谷区道玄坂1-12", workers: 2, category: "ハーフ", categoryColor: "slate", receivedDate: "2/5", notes: "午前のみ", pdfUrl: null, syncStatus: "synced" },
     { id: "10-3", time: "13:00", clientName: "中央設備", contactPerson: "木村様", siteAddress: "練馬区豊玉北5-3", mapUrl: "https://www.google.com/maps/search/練馬区豊玉北5-3", workers: 1, category: "常用", categoryColor: "blue", receivedDate: "2/6", notes: "", pdfUrl: null, syncStatus: "unsynced" },
   ],
+}
+
+// -------------------------------------------------------------------
+// Daily Performance Metrics keyed by date
+// -------------------------------------------------------------------
+interface DailyMetrics {
+  target: number
+  totalOrders: number
+  am: number
+  pm: number
+  night: number
+  gold: number
+  freely: number
+  other: number
+  confirmed: number
+  unconfirmed: number
+}
+
+const DAILY_METRICS: Record<string, DailyMetrics> = {
+  "2026-02-01": { target: 5, totalOrders: 3, am: 2, pm: 3, night: 0, gold: 1, freely: 2, other: 0, confirmed: 3, unconfirmed: 0 },
+  "2026-02-02": { target: 12, totalOrders: 9, am: 6, pm: 9, night: 0, gold: 2, freely: 6, other: 1, confirmed: 7, unconfirmed: 2 },
+  "2026-02-03": { target: 40, totalOrders: 45, am: 42, pm: 45, night: 3, gold: 6, freely: 38, other: 1, confirmed: 43, unconfirmed: 2 },
+  "2026-02-04": { target: 10, totalOrders: 5, am: 2, pm: 5, night: 0, gold: 1, freely: 4, other: 0, confirmed: 4, unconfirmed: 1 },
+  "2026-02-05": { target: 10, totalOrders: 5, am: 3, pm: 5, night: 0, gold: 1, freely: 3, other: 1, confirmed: 5, unconfirmed: 0 },
+  "2026-02-10": { target: 15, totalOrders: 7, am: 6, pm: 7, night: 0, gold: 2, freely: 4, other: 1, confirmed: 5, unconfirmed: 2 },
 }
 
 const CATEGORY_CLASSES: Record<string, string> = {
@@ -315,19 +346,22 @@ function ProjectsContent() {
     }
   }, [])
 
+  const key = dateKey(year, month, selectedDay)
+  const currentData = DAILY_DATA[key] || []
+  const metrics = DAILY_METRICS[key] || null
+  const totalWorkers = currentData.reduce((sum, r) => sum + r.workers, 0)
+  const targetMet = metrics ? metrics.totalOrders >= metrics.target : false
+
   const handleSync = useCallback(() => {
     setIsSyncing(true)
+    const rowCount = (DAILY_DATA[dateKey(year, month, selectedDay)] || []).length
     setTimeout(() => {
       setIsSyncing(false)
       toast.success(`${month + 1}/${selectedDay}のデータをシートに書き込みました`, {
-        description: `${currentData.length}件の案件を同期しました`,
+        description: `${rowCount}件の案件を同期しました`,
       })
     }, 1200)
-  }, [month, selectedDay])
-
-  const key = dateKey(year, month, selectedDay)
-  const currentData = DAILY_DATA[key] || []
-  const totalWorkers = currentData.reduce((sum, r) => sum + r.workers, 0)
+  }, [year, month, selectedDay])
 
   const filteredData = search
     ? currentData.filter((r) => {
@@ -387,47 +421,144 @@ function ProjectsContent() {
         </ScrollArea>
       </div>
 
-      {/* Section 3: Action Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-slate-700 font-medium">
-              案件数: <span className="text-blue-600 font-bold">{currentData.length}件</span>
-            </span>
-            <span className="text-slate-300">|</span>
-            <span className="text-slate-700 font-medium">
-              人工: <span className="text-blue-600 font-bold">{totalWorkers}名</span>
-            </span>
+      {/* Section 3: Daily Performance Panel */}
+      {metrics ? (
+        <div className="mb-4 rounded-lg border border-slate-200 bg-slate-900 text-white p-4">
+          <div className="flex flex-wrap items-center gap-6">
+            {/* Group A: Total Orders vs Target */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-800">
+                <Target className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 font-medium leading-none mb-1">
+                  総受注 (Target: {metrics.target})
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-2xl font-bold tabular-nums leading-none ${targetMet ? "text-emerald-400" : "text-orange-400"}`}>
+                    {metrics.totalOrders}
+                  </span>
+                  {targetMet ? (
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] px-1.5 py-0">達成</Badge>
+                  ) : (
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[10px] px-1.5 py-0">
+                      未達 ({metrics.target - metrics.totalOrders})
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Separator orientation="vertical" className="h-10 bg-slate-700" />
+
+            {/* Group B: Time Breakdown */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-800">
+                <Clock className="h-5 w-5 text-slate-400" />
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider">AM</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-slate-100">{metrics.am}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider">PM</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-slate-100">{metrics.pm}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider">夜間</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-slate-100">{metrics.night}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator orientation="vertical" className="h-10 bg-slate-700" />
+
+            {/* Group C: Staff Categories */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-800">
+                <Users className="h-5 w-5 text-slate-400" />
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div>
+                  <p className="text-[10px] text-amber-400 uppercase tracking-wider">ゴールド</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-amber-300">{metrics.gold}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-blue-400 uppercase tracking-wider">フリーリー</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-blue-300">{metrics.freely}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider">その他</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-slate-300">{metrics.other}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator orientation="vertical" className="h-10 bg-slate-700" />
+
+            {/* Group D: Staffing Status */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-800">
+                <TrendingUp className="h-5 w-5 text-slate-400" />
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                {metrics.unconfirmed > 0 ? (
+                  <div className="flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-orange-400" />
+                    <div>
+                      <p className="text-[10px] text-orange-400 uppercase tracking-wider">未確定</p>
+                      <p className="text-lg font-bold tabular-nums leading-none text-orange-400">{metrics.unconfirmed}件</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">未確定</p>
+                    <p className="text-lg font-bold tabular-nums leading-none text-slate-500">0件</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-[10px] text-emerald-400 uppercase tracking-wider">確定済</p>
+                  <p className="text-lg font-bold tabular-nums leading-none text-emerald-400">{metrics.confirmed}件</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="検索..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-9 w-52 bg-white"
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 gap-1.5"
-            onClick={handleSync}
-            disabled={isSyncing}
-          >
-            {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
-            スプシ同期
-          </Button>
-          <Button size="sm" className="h-9 gap-1.5 bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4" />
-            案件登録
-          </Button>
+      ) : (
+        <div className="mb-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-400">
+          この日の受注管理データはありません
         </div>
+      )}
+
+      {/* Section 4: Action Toolbar */}
+      <div className="flex flex-wrap items-center justify-end gap-3 mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input
+            placeholder="検索..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-9 w-52 bg-white"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5"
+          onClick={handleSync}
+          disabled={isSyncing}
+        >
+          {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
+          スプシ同期
+        </Button>
+        <Button size="sm" className="h-9 gap-1.5 bg-blue-600 hover:bg-blue-700">
+          <Plus className="h-4 w-4" />
+          案件登録
+        </Button>
       </div>
 
-      {/* Section 4: Daily Data Grid */}
+      {/* Section 5: Daily Data Grid */}
       <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
