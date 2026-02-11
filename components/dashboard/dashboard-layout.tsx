@@ -12,7 +12,7 @@ function MainContent({ children }: { children: ReactNode }) {
   return (
     <main
       className={cn(
-        "min-h-screen pt-16 transition-all duration-300 ease-in-out bg-slate-50",
+        "min-h-screen pt-16 transition-[padding-left] duration-300 ease-in-out bg-slate-50",
         isCollapsed ? "pl-20" : "pl-64",
       )}
     >

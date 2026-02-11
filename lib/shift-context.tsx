@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react"
 
 // Site data type
 export interface SiteData {
@@ -144,7 +144,7 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
   const [workers, setWorkers] = useState<WorkerData[]>(initialWorkers)
   const [sendLogs, setSendLogs] = useState<SendLog[]>([])
 
-  const assignWorkerToSite = (siteId: string, slotIndex: number, workerName: string | null) => {
+  const assignWorkerToSite = useCallback((siteId: string, slotIndex: number, workerName: string | null) => {
     setSites((prevSites) =>
       prevSites.map((site) => {
         if (site.id === siteId) {
@@ -155,55 +155,55 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
         return site
       }),
     )
-  }
+  }, [])
 
-  const getWorkerAssignedSites = (workerName: string): SiteData[] => {
+  const getWorkerAssignedSites = useCallback((workerName: string): SiteData[] => {
     return sites
       .filter((site) => site.assignedWorkers.includes(workerName))
       .sort((a, b) => a.time.localeCompare(b.time))
-  }
+  }, [sites])
 
-  const getAssignedWorkersForSite = (siteId: string): string[] => {
+  const getAssignedWorkersForSite = useCallback((siteId: string): string[] => {
     const site = sites.find((s) => s.id === siteId)
     if (!site) return []
     return site.assignedWorkers.filter((w): w is string => w !== null)
-  }
+  }, [sites])
 
-  const addSendLog = (log: SendLog) => {
+  const addSendLog = useCallback((log: SendLog) => {
     setSendLogs((prev) => [log, ...prev])
-  }
+  }, [])
 
-  const markWorkerSent = (workerId: string, status: "sent" | "error") => {
+  const markWorkerSent = useCallback((workerId: string, status: "sent" | "error") => {
     setWorkers((prevWorkers) => prevWorkers.map((worker) => (worker.id === workerId ? { ...worker, status } : worker)))
-  }
+  }, [])
 
-  const markAllWorkersSent = () => {
+  const markAllWorkersSent = useCallback(() => {
     setWorkers((prevWorkers) =>
       prevWorkers.map((worker) => (worker.status === "unsent" ? { ...worker, status: "sent" as const } : worker)),
     )
-  }
+  }, [])
 
-  const resetWorkerStatuses = () => {
+  const resetWorkerStatuses = useCallback(() => {
     setWorkers((prevWorkers) => prevWorkers.map((worker) => ({ ...worker, status: "unsent" as const })))
-  }
+  }, [])
+
+  const contextValue = useMemo(() => ({
+    selectedDate,
+    setSelectedDate,
+    sites,
+    workers,
+    assignWorkerToSite,
+    getWorkerAssignedSites,
+    getAssignedWorkersForSite,
+    sendLogs,
+    addSendLog,
+    markWorkerSent,
+    markAllWorkersSent,
+    resetWorkerStatuses,
+  }), [selectedDate, sites, workers, sendLogs, assignWorkerToSite, getWorkerAssignedSites, getAssignedWorkersForSite, addSendLog, markWorkerSent, markAllWorkersSent, resetWorkerStatuses])
 
   return (
-    <ShiftContext.Provider
-      value={{
-        selectedDate,
-        setSelectedDate,
-        sites,
-        workers,
-        assignWorkerToSite,
-        getWorkerAssignedSites,
-        getAssignedWorkersForSite,
-        sendLogs,
-        addSendLog,
-        markWorkerSent,
-        markAllWorkersSent,
-        resetWorkerStatuses,
-      }}
-    >
+    <ShiftContext.Provider value={contextValue}>
       {children}
     </ShiftContext.Provider>
   )

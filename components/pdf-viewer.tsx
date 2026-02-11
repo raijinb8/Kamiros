@@ -22,11 +22,16 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
   const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  // Fetch the PDF as an ArrayBuffer to ensure binary integrity
+  // Fetch the PDF as an ArrayBuffer with caching
   useEffect(() => {
+    // Skip if already loaded for this file
+    if (pdfData && loadError === null) return
+
     setLoadError(null)
     setPdfData(null)
-    fetch(file)
+
+    const controller = new AbortController()
+    fetch(file, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.arrayBuffer()
@@ -35,9 +40,13 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
         setPdfData(buffer)
       })
       .catch((err) => {
-        setLoadError(err.message)
+        if (err.name !== "AbortError") {
+          setLoadError(err.message)
+        }
       })
-  }, [file])
+
+    return () => controller.abort()
+  }, [file]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Memoize the file object to avoid unnecessary re-renders
   const fileData = useMemo(() => (pdfData ? { data: pdfData } : null), [pdfData])
@@ -98,8 +107,8 @@ export function PdfViewer({ file, zoom, rotation }: PdfViewerProps) {
             <Page
               pageNumber={currentPage}
               width={560}
-              renderTextLayer={true}
-              renderAnnotationLayer={true}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
             />
           </Document>
         </div>
