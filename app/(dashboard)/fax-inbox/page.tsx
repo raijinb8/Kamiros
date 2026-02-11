@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search, ChevronLeft, ChevronRight, X, CheckCircle2, PanelLeftClose, PanelLeftOpen, ZoomIn, ZoomOut, RotateCw } from "lucide-react"
+import { PdfViewer } from "@/components/pdf-viewer"
 
 // Dummy FAX data
 const dummyFaxList = [
@@ -723,20 +724,8 @@ function FaxInboxContent() {
               </Button>
             </div>
           </div>
-          <div className="flex-1 overflow-auto flex items-start justify-center">
-            <div
-              className="w-full h-full transition-transform duration-300 ease-in-out"
-              style={{
-                transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                transformOrigin: "center center",
-              }}
-            >
-              <iframe
-                src="/sample-fax.pdf"
-                title="FAX Document Preview"
-                className="w-full h-full border-0"
-              />
-            </div>
+          <div className="flex-1 overflow-hidden">
+            <PdfViewer file="/sample-fax.pdf" zoom={zoom} rotation={rotation} />
           </div>
           {/* Preview Navigation */}
           <div className="p-3 border-t border-slate-200 bg-white flex justify-center gap-3">
