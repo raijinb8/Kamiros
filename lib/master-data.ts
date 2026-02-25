@@ -410,14 +410,14 @@ export const customers: Customer[] = [
 
 export const workers: Worker[] = [
   {
-    id: "w1", no: 1, name: "古市 英佑", furigana: "フルイチ エイスケ",
+    id: "w1", no: 1, name: "松枝カイ水樹", furigana: "マツエダ カイミズキ",
     employmentType: "個人事業主", fullPrice: 11200, halfPrice: 8200, distanceAllowance: 2000,
     phone: "090-1111-2222", startDate: "2020/04/01", monthlyWork: "38H", monthlyAdvance: 60000, status: "在籍",
-    birthDate: "1990/05/12", email: "furuichi@example.com", postalCode: "332-0001",
+    birthDate: "1990/05/12", email: "matsueda@example.com", postalCode: "332-0001",
     address: "埼玉県川口市朝日1-1-1", nearestStation: "JR川口駅",
-    qualifications: ["フォークリフト", "玉掛け"], emergencyContact: "古市 花子（妻）090-1111-3333",
+    qualifications: ["フォークリフト", "玉掛け"], emergencyContact: "松枝 花子（妻）090-1111-3333",
     earlyAllowance: 1500, holidayAllowanceRate: 25,
-    bankName: "三菱UFJ銀行", branchName: "川口支店", accountType: "普通", accountNumber: "****1234", accountHolder: "フルイチ エイスケ",
+    bankName: "三菱UFJ銀行", branchName: "川口支店", accountType: "普通", accountNumber: "****1234", accountHolder: "マツエダ カイミズキ",
     annualLeave: 10, usedLeave: 2, remainingLeave: 8, nextLeaveDate: "2027/04/01",
     monthlyPayEstimate: 280000, notes: "",
     history: [
@@ -427,7 +427,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w2", no: 3, name: "鈴木 大地", furigana: "スズキ ダイチ",
-    employmentType: "個人事業主", fullPrice: 11200, halfPrice: 8200, distanceAllowance: 2000,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-2222-3333", startDate: "2021/06/15", monthlyWork: "34H", monthlyAdvance: 32000, status: "在籍",
     birthDate: "1992/08/20", email: "suzuki.d@example.com", postalCode: "336-0018",
     address: "埼玉県さいたま市南区南本町2-4-6", nearestStation: "JR南浦和駅",
@@ -442,7 +442,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w3", no: 5, name: "石黒 豪", furigana: "イシグロ ゴウ",
-    employmentType: "個人事業主", fullPrice: 12000, halfPrice: 8500, distanceAllowance: 2500,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-3333-4444", startDate: "2019/08/01", monthlyWork: "42H", monthlyAdvance: 32000, status: "在籍",
     birthDate: "1988/01/30", email: "ishiguro@example.com", postalCode: "330-0072",
     address: "埼玉県さいたま市浦和区領家5-3-2", nearestStation: "JR北浦和駅",
@@ -473,7 +473,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w5", no: 8, name: "佐藤 祐輔", furigana: "サトウ ユウスケ",
-    employmentType: "個人事業主", fullPrice: 11200, halfPrice: 8200, distanceAllowance: 2000,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-5555-6666", startDate: "2022/03/01", monthlyWork: "36H", monthlyAdvance: 128000, status: "在籍",
     birthDate: "1995/03/15", email: "sato.yusuke@example.com", postalCode: "332-0015",
     address: "埼玉県川口市川口3-2-1", nearestStation: "JR川口駅",
@@ -490,7 +490,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w6", no: 10, name: "真部 義明", furigana: "マナベ ヨシアキ",
-    employmentType: "個人事業主", fullPrice: 11500, halfPrice: 8400, distanceAllowance: 3000,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-6666-7777", startDate: "2021/11/20", monthlyWork: "30H", monthlyAdvance: 64000, status: "在籍",
     birthDate: "1987/07/22", email: "manabe@example.com", postalCode: "338-0001",
     address: "埼玉県さいたま市中央区上落合2-1-3", nearestStation: "JR北与野駅",
@@ -521,7 +521,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w8", no: 15, name: "渡邊 良平", furigana: "ワタナベ リョウヘイ",
-    employmentType: "個人事業主", fullPrice: 11200, halfPrice: 8200, distanceAllowance: 2000,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-8888-9999", startDate: "2023/07/15", monthlyWork: "30H", monthlyAdvance: 30000, status: "在籍",
     birthDate: "1993/12/01", email: "watanabe.r@example.com", postalCode: "337-0042",
     address: "埼玉県さいたま市見沼区南中野1-8-2", nearestStation: "JR大和田駅",
@@ -566,7 +566,7 @@ export const workers: Worker[] = [
   },
   {
     id: "w11", no: 22, name: "石崎 剛哉", furigana: "イシザキ ゴウヤ",
-    employmentType: "個人事業主", fullPrice: 11200, halfPrice: 8200, distanceAllowance: 2500,
+    employmentType: "アルバイト", fullPrice: 9000, halfPrice: 6000, distanceAllowance: 2000,
     phone: "090-1234-5678", startDate: "2022/08/10", monthlyWork: "40H", monthlyAdvance: 32000, status: "在籍",
     birthDate: "1991/03/08", email: "ishizaki@example.com", postalCode: "330-0062",
     address: "埼玉県さいたま市浦和区仲町4-2-1", nearestStation: "JR浦和駅",
