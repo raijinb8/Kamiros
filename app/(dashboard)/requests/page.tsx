@@ -37,7 +37,9 @@ export default function RequestsPage() {
 
       {/* Page title */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">申請管理</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          申請管理
+        </h1>
       </div>
 
       {/* Tabs */}
