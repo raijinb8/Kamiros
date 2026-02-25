@@ -160,14 +160,14 @@ export function BillingHistoryTab() {
       {isSearched && (
         <div className="border border-slate-200 rounded-lg overflow-hidden bg-white">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[800px]">
               <TableHeader className="bg-slate-50 sticky top-0 z-10">
                 <TableRow className="hover:bg-slate-50">
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">請求年月</TableHead>
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">顧客CD</TableHead>
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">顧客名</TableHead>
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">締日</TableHead>
-                  <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">請求金額（税込）</TableHead>
+                  <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[140px] px-3">請求金額（税込）</TableHead>
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">発行日</TableHead>
                   <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">操作</TableHead>
                 </TableRow>
@@ -186,7 +186,7 @@ export function BillingHistoryTab() {
                       <TableCell className="text-sm text-slate-700 font-mono tabular-nums">{h.customerCode}</TableCell>
                       <TableCell className="text-sm text-slate-900 font-medium whitespace-nowrap">{h.customerName}</TableCell>
                       <TableCell className="text-sm text-slate-700">{h.closingDay}</TableCell>
-                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-bold">{formatJPY(h.totalWithTax)}</TableCell>
+                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-bold whitespace-nowrap px-3">{formatJPY(h.totalWithTax)}</TableCell>
                       <TableCell className="text-sm text-slate-700 font-mono tabular-nums">{h.issuedDate}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">

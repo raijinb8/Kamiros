@@ -8,7 +8,7 @@ import { Toaster } from "sonner"
 
 export default function BillingPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Page title */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">請求管理</h1>
