@@ -3,7 +3,7 @@
 import { Suspense, memo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Inbox, Send, Settings, ClipboardList } from "lucide-react"
+import { Home, Inbox, Send, Settings, ClipboardList, FileCheck, Receipt, Wallet } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
@@ -27,6 +27,21 @@ const navItems = [
     label: "案件管理",
     icon: ClipboardList,
     href: "/projects",
+  },
+  {
+    label: "現場終了報告",
+    icon: FileCheck,
+    href: "/site-reports",
+  },
+  {
+    label: "請求管理",
+    icon: Receipt,
+    href: "/billing",
+  },
+  {
+    label: "給与管理",
+    icon: Wallet,
+    href: "/payroll",
   },
   {
     label: "設定",
