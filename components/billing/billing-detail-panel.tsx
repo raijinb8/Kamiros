@@ -155,7 +155,7 @@ export function BillingDetailPanel({
             </h3>
             <div className="border border-slate-200 rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="min-w-[900px]">
                   <TableHeader className="bg-slate-50">
                     <TableRow className="hover:bg-slate-50">
                       <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">作業日</TableHead>
@@ -163,11 +163,11 @@ export function BillingDetailPanel({
                       <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">現場名</TableHead>
                       <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">区分</TableHead>
                       <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">人工</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">基本単価</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">基本金額</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">交通費</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">諸手当</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">小計</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[100px] px-3">基本単価</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[120px] px-3">基本金額</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[100px] px-3">交通費</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[100px] px-3">諸手当</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[120px] px-3">小計</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -189,11 +189,11 @@ export function BillingDetailPanel({
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{d.manDays.toFixed(1)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.unitPrice)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.baseAmount)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.transportCost)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.allowances)}</TableCell>
-                        <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium whitespace-nowrap">{formatJPY(d.lineTotal)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap px-3">{formatJPY(d.unitPrice)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap px-3">{formatJPY(d.baseAmount)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap px-3">{formatJPY(d.transportCost)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap px-3">{formatJPY(d.allowances)}</TableCell>
+                        <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium whitespace-nowrap px-3">{formatJPY(d.lineTotal)}</TableCell>
                       </TableRow>
                     ))}
                     {/* Totals row */}
@@ -205,16 +205,16 @@ export function BillingDetailPanel({
                         {customer.manDays.toFixed(1)}
                       </TableCell>
                       <TableCell />
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap px-3">
                         {formatJPY(customer.baseAmount)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap px-3">
                         {formatJPY(customer.transportCost)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap px-3">
                         {formatJPY(customer.allowances)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap px-3">
                         {formatJPY(customer.subtotal)}
                       </TableCell>
                     </TableRow>
