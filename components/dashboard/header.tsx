@@ -24,13 +24,13 @@ export function Header() {
           </Button>
           <div className="flex items-baseline gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Kamiros</h1>
-            <span className="text-xs text-slate-500">for 建設・運送業</span>
+            <span className="text-xs text-slate-500">荷揚げ業向け業務管理SaaS</span>
           </div>
         </div>
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-600 hidden sm:inline">事務担当者A</span>
+          <span className="text-sm text-slate-600 hidden sm:inline">田中 篤史</span>
           <Avatar className="h-9 w-9 bg-blue-600">
             <AvatarFallback className="bg-blue-600 text-white text-sm">
               <User className="h-4 w-4" />

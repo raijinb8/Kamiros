@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Kamiros - FAX自動化SaaS",
-  description: "建設・運送業向けFAX自動化サービス",
+  title: "Kamiros - 荷揚げ業向け業務管理SaaS",
+  description: "荷揚げ業向け業務管理SaaS - FAX受信・案件管理・シフト連絡・請求・給与を一元管理",
   generator: "v0.app",
   icons: {
     icon: [
