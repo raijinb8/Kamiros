@@ -162,7 +162,7 @@ export function BillingClosingTab() {
   }, [filteredCustomers])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0">
       {/* Filter area */}
       <Card className="bg-white border-slate-200">
         <CardContent className="pt-5 pb-4">
@@ -226,7 +226,7 @@ export function BillingClosingTab() {
       {isAggregated && (
         <>
           {/* KPI Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             <Card className="bg-slate-50 border-slate-200">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-slate-600">対象顧客数</CardTitle>
@@ -246,7 +246,7 @@ export function BillingClosingTab() {
                 <FileText className="h-5 w-5 text-slate-500 shrink-0" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 font-mono tabular-nums whitespace-nowrap">
+                <div className="text-lg font-bold text-slate-900 font-mono tabular-nums sm:text-xl xl:text-2xl">
                   {formatJPY(kpis.totalAmount)}
                 </div>
               </CardContent>

@@ -16,7 +16,7 @@ function MainContent({ children }: { children: ReactNode }) {
         isCollapsed ? "pl-20" : "pl-64",
       )}
     >
-      <div className="p-6">{children}</div>
+      <div className="p-6 min-w-0">{children}</div>
     </main>
   )
 }
