@@ -3,11 +3,23 @@
 import { Suspense, memo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Inbox, Send, Settings, ClipboardList, FileCheck, Receipt, Wallet } from "lucide-react"
+import { Home, Inbox, Send, Settings, ClipboardList, FileCheck, Receipt, Wallet, FileQuestion, Database } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
-const navItems = [
+type NavItem = {
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  href: string
+  separator?: never
+} | {
+  separator: true
+  label?: never
+  icon?: never
+  href?: never
+}
+
+const navItems: NavItem[] = [
   {
     label: "ダッシュボード",
     icon: Home,
@@ -19,19 +31,24 @@ const navItems = [
     href: "/fax-inbox",
   },
   {
-    label: "シフト連絡",
-    icon: Send,
-    href: "/shift-notification",
-  },
-  {
     label: "案件管理",
     icon: ClipboardList,
     href: "/projects",
   },
   {
+    label: "シフト連絡",
+    icon: Send,
+    href: "/shift-notification",
+  },
+  {
     label: "現場終了報告",
     icon: FileCheck,
     href: "/site-reports",
+  },
+  {
+    label: "申請管理",
+    icon: FileQuestion,
+    href: "/requests",
   },
   {
     label: "請求管理",
@@ -42,6 +59,12 @@ const navItems = [
     label: "給与管理",
     icon: Wallet,
     href: "/payroll",
+  },
+  { separator: true },
+  {
+    label: "マスタ管理",
+    icon: Database,
+    href: "/master",
   },
   {
     label: "設定",
@@ -56,7 +79,16 @@ function SidebarNav() {
 
   return (
     <nav className="flex flex-col gap-1 p-3 mt-4">
-      {navItems.map((item) => {
+      {navItems.map((item, index) => {
+        if (item.separator) {
+          return (
+            <div
+              key={`sep-${index}`}
+              className={cn("my-2 border-t border-slate-700", isCollapsed ? "mx-2" : "mx-3")}
+            />
+          )
+        }
+
         const isActive = pathname === item.href
         const Icon = item.icon
 
