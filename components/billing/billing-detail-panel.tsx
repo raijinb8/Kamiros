@@ -189,11 +189,11 @@ export function BillingDetailPanel({
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{d.manDays.toFixed(1)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(d.unitPrice)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(d.baseAmount)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(d.transportCost)}</TableCell>
-                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(d.allowances)}</TableCell>
-                        <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium">{formatJPY(d.lineTotal)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.unitPrice)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.baseAmount)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.transportCost)}</TableCell>
+                        <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(d.allowances)}</TableCell>
+                        <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium whitespace-nowrap">{formatJPY(d.lineTotal)}</TableCell>
                       </TableRow>
                     ))}
                     {/* Totals row */}
@@ -205,16 +205,16 @@ export function BillingDetailPanel({
                         {customer.manDays.toFixed(1)}
                       </TableCell>
                       <TableCell />
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
                         {formatJPY(customer.baseAmount)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
                         {formatJPY(customer.transportCost)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
                         {formatJPY(customer.allowances)}
                       </TableCell>
-                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums">
+                      <TableCell className="text-sm font-bold text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">
                         {formatJPY(customer.subtotal)}
                       </TableCell>
                     </TableRow>
@@ -225,19 +225,19 @@ export function BillingDetailPanel({
 
             {/* Tax and total */}
             <div className="mt-4 flex justify-end">
-              <div className="w-64 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">小計</span>
-                  <span className="font-mono tabular-nums text-slate-900">{formatJPY(customer.subtotal)}</span>
+              <div className="w-72 sm:w-80 space-y-2 text-sm">
+                <div className="flex justify-between gap-4">
+                  <span className="text-slate-500 shrink-0">小計</span>
+                  <span className="font-mono tabular-nums text-slate-900 whitespace-nowrap">{formatJPY(customer.subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">消費税（10%）</span>
-                  <span className="font-mono tabular-nums text-slate-900">{formatJPY(customer.tax)}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-slate-500 shrink-0">消費税（10%）</span>
+                  <span className="font-mono tabular-nums text-slate-900 whitespace-nowrap">{formatJPY(customer.tax)}</span>
                 </div>
                 <Separator />
-                <div className="flex justify-between font-bold text-base">
-                  <span className="text-slate-900">請求金額（税込）</span>
-                  <span className="font-mono tabular-nums text-slate-900">{formatJPY(customer.totalWithTax)}</span>
+                <div className="flex justify-between gap-4 font-bold text-base">
+                  <span className="text-slate-900 shrink-0">請求金額（税込）</span>
+                  <span className="font-mono tabular-nums text-slate-900 whitespace-nowrap">{formatJPY(customer.totalWithTax)}</span>
                 </div>
               </div>
             </div>

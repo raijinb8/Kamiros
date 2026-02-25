@@ -240,13 +240,13 @@ export function BillingClosingTab() {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-50 border-slate-200">
+            <Card className="bg-slate-50 border-slate-200 overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-slate-600">請求総額（税抜）</CardTitle>
-                <FileText className="h-5 w-5 text-slate-500" />
+                <FileText className="h-5 w-5 text-slate-500 shrink-0" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-slate-900 font-mono tabular-nums">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 font-mono tabular-nums truncate" title={formatJPY(kpis.totalAmount)}>
                   {formatJPY(kpis.totalAmount)}
                 </div>
               </CardContent>
@@ -314,12 +314,12 @@ export function BillingClosingTab() {
                     <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">締日</TableHead>
                     <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">案件数</TableHead>
                     <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">人工計</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">基本金額</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">交通費計</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">諸手当計</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">請求金額（税抜）</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">消費税</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap">請求金額（税込）</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[100px]">基本金額</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[90px]">交通費計</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[90px]">諸手当計</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[120px]">請求金額（税抜）</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[100px]">消費税</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-semibold text-right whitespace-nowrap min-w-[130px]">請求金額（税込）</TableHead>
                     <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">ステータス</TableHead>
                     <TableHead className="text-slate-600 text-xs font-semibold whitespace-nowrap">操作</TableHead>
                   </TableRow>
@@ -347,12 +347,12 @@ export function BillingClosingTab() {
                       <TableCell className="text-sm text-slate-700">{c.closingDay}</TableCell>
                       <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{c.projectCount}</TableCell>
                       <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{c.manDays.toFixed(1)}</TableCell>
-                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(c.baseAmount)}</TableCell>
-                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(c.transportCost)}</TableCell>
-                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(c.allowances)}</TableCell>
-                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium">{formatJPY(c.subtotal)}</TableCell>
-                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums">{formatJPY(c.tax)}</TableCell>
-                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-bold">{formatJPY(c.totalWithTax)}</TableCell>
+                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(c.baseAmount)}</TableCell>
+                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(c.transportCost)}</TableCell>
+                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(c.allowances)}</TableCell>
+                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-medium whitespace-nowrap">{formatJPY(c.subtotal)}</TableCell>
+                      <TableCell className="text-sm text-slate-700 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(c.tax)}</TableCell>
+                      <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums font-bold whitespace-nowrap">{formatJPY(c.totalWithTax)}</TableCell>
                       <TableCell>
                         <StatusBadge status={c.status} />
                       </TableCell>
@@ -386,12 +386,12 @@ export function BillingClosingTab() {
                     <TableCell />
                     <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{totals.projectCount}</TableCell>
                     <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{totals.manDays.toFixed(1)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.baseAmount)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.transportCost)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.allowances)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.subtotal)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.tax)}</TableCell>
-                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums">{formatJPY(totals.totalWithTax)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.baseAmount)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.transportCost)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.allowances)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.subtotal)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.tax)}</TableCell>
+                    <TableCell className="text-sm text-slate-900 text-right font-mono tabular-nums whitespace-nowrap">{formatJPY(totals.totalWithTax)}</TableCell>
                     <TableCell />
                     <TableCell />
                   </TableRow>
