@@ -11,12 +11,14 @@ type NavItem = {
   label: string
   icon: React.ComponentType<{ className?: string }>
   href: string
+  badge?: number
   separator?: never
 } | {
   separator: true
   label?: never
   icon?: never
   href?: never
+  badge?: never
 }
 
 const navItems: NavItem[] = [
@@ -49,6 +51,7 @@ const navItems: NavItem[] = [
     label: "申請管理",
     icon: FileQuestion,
     href: "/requests",
+    badge: 11,
   },
   {
     label: "請求管理",
@@ -97,14 +100,26 @@ function SidebarNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+              "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
               "text-slate-300 hover:text-white hover:bg-slate-800",
               isActive && "bg-slate-700 text-white border-l-4 border-blue-500 -ml-0.5 pl-2.5",
               isCollapsed && "justify-center px-2",
             )}
           >
             <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-blue-400")} />
-            {!isCollapsed && <span className="truncate">{item.label}</span>}
+            {!isCollapsed && (
+              <>
+                <span className="truncate">{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className="ml-auto shrink-0 h-5 min-w-5 px-1.5 rounded-full bg-orange-500 text-white text-[10px] font-semibold inline-flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </>
+            )}
+            {isCollapsed && item.badge && item.badge > 0 && (
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-orange-500" />
+            )}
           </Link>
         )
       })}
